@@ -18,13 +18,15 @@ public class UserListDto {
     private String upda_user;
     private String use_yn = "Y";
 
-    public UserListDto(Integer id, String user_nm, String user_id, String pw, Date regi_dt, String regi_user, String use_yn) {
+    public UserListDto(Integer id, String user_nm, String user_id, String pw, Date regi_dt, String regi_user, String upda_user, Date upda_dt, String use_yn) {
         this.id = id;
         this.user_nm = user_nm;
         this.user_id = user_id;
         this.pw = pw;
         this.regi_dt = regi_dt;
         this.regi_user = regi_user;
+        this.upda_user = upda_user;
+        this.upda_dt = upda_dt;
         this.use_yn = use_yn;
     }
     // getter
@@ -63,4 +65,5 @@ public class UserListDto {
     public String getUse_yn() {
         return use_yn;
     }
+
 }

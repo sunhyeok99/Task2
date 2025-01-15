@@ -104,4 +104,17 @@ public class User {
         return use_yn;
     }
 
+    // 수정 메서드
+    public void update(){
+        this.upda_user = this.regi_user;
+        this.upda_dt = new Date();
+    }
+
+    // 삭제 메서드
+    public void delete() {
+        this.upda_user = this.regi_user;
+        this.upda_dt = new Date();
+        this.use_yn = "N";
+    }
+
 }

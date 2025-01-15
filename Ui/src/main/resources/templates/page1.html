@@ -15,7 +15,7 @@
                     </div>
                     <div class="box-body">
                         <!-- 테이블 출력 -->
-                        <div id="table"></div>
+                        <div id="dataGridContainer"></div>
                     </div>
                 </div>
             </div>
@@ -58,22 +58,49 @@
                         return response.json();})
                         .then(data => {
                             // 전체 데이터 항목 테이블 형식으로 출력
-                            let tableHtml = "<table><thead><tr><th>사용자 이름</th><th>사용자 아이디</th><th>사용자 비밀번호</th><th>등록일</th>" +
-                                             "<th>등록자 아이디</th><th>수정일</th><th>수정자 아이디</th><th>사용 여부</th></tr></thead><tbody>";
-                            data.forEach(user => {
-                                tableHtml += `<tr>
-                                    <td>${user.user_nm}</td>
-                                    <td>${user.user_id}</td>
-                                    <td>${user.pw}</td>
-                                    <td>${user.regi_dt}</td>
-                                    <td>${user.regi_user}</td>
-                                    <td>${user.upda_dt}</td>
-                                    <td>${user.upda_user}</td>
-                                    <td>${user.use_yn}</td>
-                                </tr>`;
+                            // -> dxDataGrid 형태로 변경
+                            $("#dataGridContainer").dxDataGrid({
+                                dataSource: data,
+                                columns: [
+                                    { dataField: "user_nm", caption: "사용자 이름" },
+                                    { dataField: "user_id", caption: "사용자 아이디" },
+                                    { dataField: "pw", caption: "사용자 비밀번호" },
+                                    { dataField: "regi_dt", caption: "등록일" },
+                                    { dataField: "regi_user", caption: "등록자 아이디" },
+                                    { dataField: "upda_dt", caption: "수정일" },
+                                    { dataField: "upda_user", caption: "수정자 아이디" },
+                                    { dataField: "use_yn", caption: "사용 여부" },
+                                    // 수정 및 삭제 버튼 추가
+                                    {type: "buttons",
+                                        buttons: [
+                                            {
+                                                text: "수정",
+                                                onClick: function (e) {
+                                                    const user = e.row.data;
+                                                    if (confirm("수정하시겠습니까?")) {
+                                                        // 수정 처리 로직
+                                                        modifyUser(user.id);
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                text: "삭제",
+                                                onClick: function (e) {
+                                                    const user = e.row.data;
+                                                    if (confirm("삭제하시겠습니까?")) {
+                                                        // 삭제 처리 로직
+                                                        deleteUser(user.id);
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ],
+                                paging: { pageSize: 10 },  // 페이지당 항목 수 설정
+                                pager: { showPageSizeSelector: true, allowedPageSizes: [5, 10, 20] },
+                                filterRow: { visible: true },
+                                searchPanel: { visible: true }
                             });
-                            tableHtml += "</tbody></table>";
-                            document.getElementById('table').innerHTML = tableHtml;
                         });
                 }
 
@@ -109,6 +136,47 @@
                         });
                     // 등록후에는 모달창을 닫고 데이터 새롭게 로딩
                 }
+
+                // 사용자 수정 처리
+                function modifyUser(id) {
+                    fetch(`http://localhost:8082/bi/user/update/${id}`, {
+                        method: 'POST'
+                    })
+                        .then(response => response .json())
+                        .then(data => {
+                            console.log(data)
+                            if (data.data === 200) {
+                                alert("수정되었습니다!");
+                                loadTableData();
+                            } else {
+                                alert(data.message || "수정 실패!");
+                            }
+                        })
+                        .catch(() => {
+                            alert("수정 실패");
+                        });
+                }
+
+                // 사용자 삭제 처리
+                function deleteUser(id) {
+                    fetch(`http://localhost:8082/bi/user/delete/${id}`, {
+                        method: 'POST'
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.data === 200){
+                            alert("삭제되었습니다!");
+                            loadTableData();
+                            } else {
+                                alert(data.message || "삭제 실패");
+                            }
+                        })
+                        .catch(() => {
+                            alert("삭제 실패");
+                        });
+                }
+
+
             </script>
         </th:block>
     </body>
