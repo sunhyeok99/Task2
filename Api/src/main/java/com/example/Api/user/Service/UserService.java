@@ -4,6 +4,8 @@ import com.example.Api.user.Dto.UserDto;
 import com.example.Api.user.Dto.UserListDto;
 import com.example.Api.user.Entity.User;
 import com.example.Api.user.Repository.UserRepository;
+import com.example.global.common.exception.CustomException;
+import com.example.global.common.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,8 @@ public class UserService {
                         user.getPw(),
                         user.getRegi_dt(),
                         user.getRegi_user(),
+                        user.getUpda_user(),
+                        user.getUpda_dt(),
                         user.getUse_yn()
                 ))
                 .collect(Collectors.toList());
@@ -51,4 +55,25 @@ public class UserService {
         // DB에 저장
         return userRepository.save(user);
     }
+
+    // 사용자 업데이트
+    @Transactional
+    public void updateUser(Integer id) {
+        User user = userRepository.findById(Long.valueOf(id)).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND_ERROR1));
+        if(user.getUse_yn().equals("N")){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND_ERROR1);
+        }
+        user.update();
+    }
+
+    // 사용자 제거
+    @Transactional
+    public void deleteUser(Integer id) {
+        User user = userRepository.findById(Long.valueOf(id)).orElseThrow(() ->  new CustomException(ErrorCode.USER_NOT_FOUND_ERROR2));
+        if(user.getUse_yn().equals("N")){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND_ERROR2);
+        }
+        user.delete();
+    }
+
 }
